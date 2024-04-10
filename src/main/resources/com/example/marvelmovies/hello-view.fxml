@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="488.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.marvelmovies.HelloController">
+    <top>
+        <MenuBar BorderPane.alignment="CENTER">
+            <menus>
+                <Menu mnemonicParsing="false" text="File">
+                    <items>
+                        <MenuItem fx:id="createTableMI" mnemonicParsing="false" onAction="#handleCreateTableMenuItem" text="Create Table" />
+                        <MenuItem fx:id="importJsonMI" mnemonicParsing="false" onAction="#handleImportJsonMenuItem" text="Import JSON" />
+                        <MenuItem fx:id="exportJsonMI" mnemonicParsing="false" onAction="#handleExportJsonMenuItem" text="Export JSON" />
+                        <MenuItem fx:id="exitMI" mnemonicParsing="false" onAction="#handleExitMenuItem" text="Exit" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Help">
+                    <items>
+                        <MenuItem fx:id="aboutMI" mnemonicParsing="false" onAction="#handleAboutMenuItem" text="About" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </top>
+    <left>
+        <TableView fx:id="moviesTV" maxHeight="1.7976931348623157E308" prefHeight="503.0" prefWidth="423.0" BorderPane.alignment="CENTER">
+            <columns>
+                <TableColumn fx:id="titleColumn" prefWidth="211.0" text="Title" />
+                <TableColumn fx:id="yearColumn" prefWidth="90.0" text="Year" />
+                <TableColumn fx:id="salesColumn" prefWidth="121.0" text="Sales" />
+            </columns>
+        </TableView>
+    </left>
+    <bottom>
+        <AnchorPane prefHeight="37.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+            <children>
+                <Label layoutX="14.0" layoutY="10.0" text="Status: ">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Label>
+            </children>
+        </AnchorPane>
+    </bottom>
+    <right>
+        <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <children>
+                <Label layoutX="58.0" layoutY="15.0" text="Operations" />
+                <Button fx:id="listRecordsButton" layoutX="16.0" layoutY="45.0" mnemonicParsing="false" onAction="#handleListRecordsButton" prefHeight="25.0" prefWidth="147.0" text="List Records" />
+                <Line endX="76.0" layoutX="90.0" layoutY="85.0" opacity="0.51" startX="-79.0" strokeWidth="0.5" />
+                <TextField layoutX="15.0" layoutY="100.0" prefHeight="25.0" prefWidth="146.0" promptText="Title" />
+                <TextField layoutX="15.0" layoutY="140.0" prefHeight="25.0" prefWidth="146.0" promptText="Year" />
+                <TextField layoutX="15.0" layoutY="180.0" prefHeight="25.0" prefWidth="146.0" promptText="Sales" />
+                <Button fx:id="addRecordsButton" layoutX="15.0" layoutY="220.0" mnemonicParsing="false" onAction="#handleAddRecordsButton" prefHeight="25.0" prefWidth="147.0" text="Add Records" />
+                <Line endX="76.0" layoutX="91.0" layoutY="260.0" opacity="0.51" startX="-79.0" strokeWidth="0.5" />
+                <Button fx:id="deleteRecordsButton" layoutX="15.0" layoutY="275.0" mnemonicParsing="false" onAction="#handleDeleteRecordsButton" prefHeight="25.0" prefWidth="147.0" text="Delete Records" />
+            </children>
+            <BorderPane.margin>
+                <Insets />
+            </BorderPane.margin>
+        </AnchorPane>
+    </right>
+</BorderPane>
