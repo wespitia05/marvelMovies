@@ -38,6 +38,12 @@ public class HelloController {
     private TableColumn <Movies, Integer> yearColumn;
     @FXML
     private TableColumn <Movies, Double> salesColumn;
+    @FXML
+    private TextField titleTF;
+    @FXML
+    private TextField yearTF;
+    @FXML
+    private TextField salesTF;
 
     public void initialize() {
         System.out.println ("initialize called");
@@ -55,6 +61,20 @@ public class HelloController {
 
     public void handleAddRecordsButton () {
         System.out.println ("handleAddRecordsButton called");
+
+        String title = titleTF.getText();
+        int year = Integer.parseInt(yearTF.getText());
+        double sales = Double.parseDouble(salesTF.getText());
+        Movies movies = new Movies (title, year, sales);
+        ObservableList<Movies> m = moviesTV.getItems();
+        m.add(movies);
+
+        System.out.println ("movie added:");
+        System.out.println ("\ttitle: " + title + "\tyear: " + year + "\tsales: " + sales);
+
+        titleTF.clear();
+        yearTF.clear();
+        salesTF.clear();
     }
 
     public void handleDeleteRecordsButton () {

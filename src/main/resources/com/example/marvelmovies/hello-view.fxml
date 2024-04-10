@@ -60,9 +60,9 @@
                 <Label layoutX="58.0" layoutY="15.0" text="Operations" />
                 <Button fx:id="listRecordsButton" layoutX="16.0" layoutY="45.0" mnemonicParsing="false" onAction="#handleListRecordsButton" prefHeight="25.0" prefWidth="147.0" text="List Records" />
                 <Line endX="76.0" layoutX="90.0" layoutY="85.0" opacity="0.51" startX="-79.0" strokeWidth="0.5" />
-                <TextField layoutX="15.0" layoutY="100.0" prefHeight="25.0" prefWidth="146.0" promptText="Title" />
-                <TextField layoutX="15.0" layoutY="140.0" prefHeight="25.0" prefWidth="146.0" promptText="Year" />
-                <TextField layoutX="15.0" layoutY="180.0" prefHeight="25.0" prefWidth="146.0" promptText="Sales" />
+                <TextField fx:id="titleTF" layoutX="15.0" layoutY="100.0" prefHeight="25.0" prefWidth="146.0" promptText="Title" />
+                <TextField fx:id="yearTF" layoutX="15.0" layoutY="140.0" prefHeight="25.0" prefWidth="146.0" promptText="Year" />
+                <TextField fx:id="salesTF" layoutX="15.0" layoutY="180.0" prefHeight="25.0" prefWidth="146.0" promptText="Sales" />
                 <Button fx:id="addRecordsButton" layoutX="15.0" layoutY="220.0" mnemonicParsing="false" onAction="#handleAddRecordsButton" prefHeight="25.0" prefWidth="147.0" text="Add Records" />
                 <Line endX="76.0" layoutX="91.0" layoutY="260.0" opacity="0.51" startX="-79.0" strokeWidth="0.5" />
                 <Button fx:id="deleteRecordsButton" layoutX="15.0" layoutY="275.0" mnemonicParsing="false" onAction="#handleDeleteRecordsButton" prefHeight="25.0" prefWidth="147.0" text="Delete Records" />
