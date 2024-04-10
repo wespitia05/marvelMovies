@@ -2,9 +2,11 @@ package com.example.marvelmovies;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import com.google.gson.*;
 
@@ -44,6 +46,8 @@ public class HelloController {
     private TextField yearTF;
     @FXML
     private TextField salesTF;
+    @FXML
+    private MouseEvent selectMovie;
 
     public void initialize() {
         System.out.println ("initialize called");
@@ -77,8 +81,15 @@ public class HelloController {
         salesTF.clear();
     }
 
-    public void handleDeleteRecordsButton () {
+    public void handleDeleteRecordsButton (ActionEvent event) {
         System.out.println ("handleDeleteRecordsButton called");
+        Movies selectedItem = moviesTV.getSelectionModel().getSelectedItem();
+        if (selectedItem != null) {
+            ObservableList<Movies> m = moviesTV.getItems();
+            m.remove(selectedItem);
+            System.out.println ("selection that will be deleted:");
+            System.out.println ("\ttitle: " + selectedItem.title + "\tyear: " + selectedItem.year + "\tsales: " + selectedItem.sales);
+        }
     }
 
     public void handleCreateTableMenuItem () {
