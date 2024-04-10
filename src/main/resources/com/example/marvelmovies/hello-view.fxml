@@ -51,6 +51,7 @@
                         <Font name="System Bold" size="14.0" />
                     </font>
                 </Label>
+            <Label fx:id="statusLabel" layoutX="63.0" layoutY="11.0" />
             </children>
         </AnchorPane>
     </bottom>

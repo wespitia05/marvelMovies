@@ -34,9 +34,9 @@ public class HelloController {
     @FXML
     private TableColumn <Movies, String> titleColumn;
     @FXML
-    private TableColumn <Movies, Integer> yearColumn;
+    private TableColumn <Movies, String> yearColumn;
     @FXML
-    private TableColumn <Movies, Double> salesColumn;
+    private TableColumn <Movies, String> salesColumn;
     @FXML
     private TextField titleTF;
     @FXML
@@ -44,16 +44,16 @@ public class HelloController {
     @FXML
     private TextField salesTF;
     @FXML
-    private MouseEvent selectMovie;
+    private Label statusLabel;
 
     public void initialize() {
         System.out.println ("initialize called");
         titleColumn.setCellValueFactory(
                 new PropertyValueFactory<Movies, String>("title"));
         yearColumn.setCellValueFactory(
-                new PropertyValueFactory<Movies, Integer>("year"));
+                new PropertyValueFactory<Movies, String>("year"));
         salesColumn.setCellValueFactory(
-                new PropertyValueFactory<Movies,Double>("sales"));
+                new PropertyValueFactory<Movies, String>("sales"));
     }
 
     public void handleListRecordsButton () {
@@ -63,19 +63,38 @@ public class HelloController {
     public void handleAddRecordsButton () {
         System.out.println ("handleAddRecordsButton called");
 
-        String title = titleTF.getText();
-        int year = Integer.parseInt(yearTF.getText());
-        double sales = Double.parseDouble(salesTF.getText());
-        Movies movies = new Movies (title, year, sales);
-        ObservableList<Movies> m = moviesTV.getItems();
-        m.add(movies);
+        String newTitle = titleTF.getText();
+        String newYear = yearTF.getText();
+        String newSales = salesTF.getText();
+        if (validInput(newTitle, newYear, newSales)) {
+            Movies movies = new Movies (newTitle, newYear, newSales);
+            ObservableList<Movies> m = moviesTV.getItems();
+            m.add(movies);
 
-        System.out.println ("movie added:");
-        System.out.println ("\ttitle: " + title + "\tyear: " + year + "\tsales: " + sales);
+            System.out.println ("movie added:");
+            System.out.println ("\ttitle: " + newTitle + "\tyear: " + newYear + "\tsales: " + newSales);
+            statusLabel.setText("A movie has been inserted: \"" + newTitle + "\"");
 
-        titleTF.clear();
-        yearTF.clear();
-        salesTF.clear();
+            titleTF.clear();
+            yearTF.clear();
+            salesTF.clear();
+        }
+        else {
+            System.out.println ("invalid input");
+        }
+    }
+
+    private boolean validInput (String title, String year, String sales) {
+        if (title.isEmpty() || !title.matches("[A-Z][\\W\\w\\s]*")) {
+            return false;
+        }
+        if (year.isEmpty() || !year.matches("\\d*")) {
+            return false;
+        }
+        if (sales.isEmpty() || !sales.matches("\\d+(\\.\\d+)?")) {
+            return false;
+        }
+        return true;
     }
 
     public void handleDeleteRecordsButton (ActionEvent event) {
@@ -86,6 +105,7 @@ public class HelloController {
             m.remove(selectedItem);
             System.out.println ("selection that will be deleted:");
             System.out.println ("\ttitle: " + selectedItem.title + "\tyear: " + selectedItem.year + "\tsales: " + selectedItem.sales);
+            statusLabel.setText("A movie has been deleted: \"" + selectedItem.title + "\"");
         }
     }
 
@@ -105,6 +125,7 @@ public class HelloController {
             try {
                 readFile(selectedFile);
                 System.out.println ("json file successfully displayed in table view");
+                statusLabel.setText("Imported data from " + selectedFile.getAbsolutePath());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -120,8 +141,8 @@ public class HelloController {
             for (JsonElement e : jArray) {
                 JsonObject jObj = e.getAsJsonObject();
                 String title = jObj.get("title").getAsString();
-                int year = jObj.get("year").getAsInt();
-                double sales = jObj.get("sales").getAsDouble();
+                String year = jObj.get("year").getAsString();
+                String sales = jObj.get("sales").getAsString();
                 Movies m = new Movies (title, year, sales);
                 movies.add(m);
             }
@@ -141,6 +162,8 @@ public class HelloController {
         File selectedFile = fileChooser.showOpenDialog(null);
         if (selectedFile != null) {
             saveFile(selectedFile);
+            System.out.println ("exported json file successfully");
+            statusLabel.setText("Exported data to " + selectedFile.getAbsolutePath());
         }
     }
 
@@ -151,8 +174,8 @@ public class HelloController {
             ObservableList<Movies> m = moviesTV.getItems();
             for (Movies movies : m) {
                 toJson.append ("  {\n")
-                        .append ("    \"sales\": \"").append (movies.getSales()).append ("\", \n")
-                        .append ("    \"year\": \"").append (movies.getYear()).append ("\", \n")
+                        .append ("    \"sales\": ").append (movies.getSales()).append (", \n")
+                        .append ("    \"year\": ").append (movies.getYear()).append (", \n")
                         .append ("    \"title\": \"").append (movies.getTitle()).append ("\" \n")
                         .append ("  },\n");
             }

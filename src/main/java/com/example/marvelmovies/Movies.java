@@ -2,10 +2,10 @@ package com.example.marvelmovies;
 
 public class Movies {
     String title;
-    int year;
-    double sales;
+    String year;
+    String sales;
 
-    public Movies (String title, int year, double sales) {
+    public Movies (String title, String year, String sales) {
         this.title = title;
         this.year = year;
         this.sales = sales;
@@ -18,19 +18,19 @@ public class Movies {
         this.title = title;
     }
 
-    public int getYear() {
+    public String getYear() {
         return year;
     }
 
-    public void setYear(int year) {
+    public void setYear(String year) {
         this.year = year;
     }
 
-    public double getSales() {
+    public String getSales() {
         return sales;
     }
 
-    public void setSales(double sales) {
+    public void setSales(String sales) {
         this.sales = sales;
     }
 }
