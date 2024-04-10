@@ -10,10 +10,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import com.google.gson.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 public class HelloController {
     @FXML
@@ -100,7 +97,7 @@ public class HelloController {
         System.out.println ("handleImportJsonMenuItem called");
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open");
+        fileChooser.setTitle("Import");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
         File selectedFile = fileChooser.showOpenDialog(null);
 
@@ -138,6 +135,37 @@ public class HelloController {
 
     public void handleExportJsonMenuItem () {
         System.out.println ("handleExportJsonMenuItem called");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Export");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
+        File selectedFile = fileChooser.showOpenDialog(null);
+        if (selectedFile != null) {
+            saveFile(selectedFile);
+        }
+    }
+
+    private void saveFile (File file) {
+        try (FileWriter writer = new FileWriter(file)) {
+            StringBuilder toJson = new StringBuilder();
+            toJson.append("[\n");
+            ObservableList<Movies> m = moviesTV.getItems();
+            for (Movies movies : m) {
+                toJson.append ("  {\n")
+                        .append ("    \"sales\": \"").append (movies.getSales()).append ("\", \n")
+                        .append ("    \"year\": \"").append (movies.getYear()).append ("\", \n")
+                        .append ("    \"title\": \"").append (movies.getTitle()).append ("\" \n")
+                        .append ("  },\n");
+            }
+            if (!m.isEmpty()) {
+                toJson.setLength(toJson.length() - 2);
+            }
+            toJson.append ("\n]");
+            writer.write (toJson.toString());
+            System.out.println ("movie data saved to: " + file.getAbsolutePath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public void handleExitMenuItem () {
