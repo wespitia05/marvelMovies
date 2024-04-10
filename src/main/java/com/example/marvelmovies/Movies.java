@@ -1,6 +1,15 @@
 package com.example.marvelmovies;
 
 public class Movies {
+    String title;
+    int year;
+    double sales;
+
+    public Movies (String title, int year, double sales) {
+        this.title = title;
+        this.year = year;
+        this.sales = sales;
+    }
     public String getTitle() {
         return title;
     }
@@ -24,8 +33,4 @@ public class Movies {
     public void setSales(double sales) {
         this.sales = sales;
     }
-
-    String title;
-    int year;
-    double sales;
 }
