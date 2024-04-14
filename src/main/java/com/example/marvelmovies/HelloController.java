@@ -6,7 +6,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import com.google.gson.*;
 
@@ -68,9 +67,12 @@ public class HelloController {
         String newTitle = titleTF.getText();
         String newYear = yearTF.getText();
         String newSales = salesTF.getText();
+
         List<String> error = validInput(newTitle, newYear, newSales);
         if (error.isEmpty()) {
-            Movies movies = new Movies (newTitle, newYear, newSales);
+            Integer yearValue = Integer.parseInt(newYear);
+            Double salesValue = Double.valueOf(newSales);
+            Movies movies = new Movies (newTitle, yearValue, salesValue);
             ObservableList<Movies> m = moviesTV.getItems();
             m.add(movies);
 
@@ -168,7 +170,9 @@ public class HelloController {
                 String title = jObj.get("title").getAsString();
                 String year = jObj.get("year").getAsString();
                 String sales = jObj.get("sales").getAsString();
-                Movies m = new Movies (title, year, sales);
+                Integer yearValue = Integer.parseInt(year);
+                Double salesValue = Double.valueOf(sales);
+                Movies m = new Movies (title, yearValue, salesValue);
                 movies.add(m);
             }
             System.out.println ("successfully read json file");
