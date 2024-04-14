@@ -11,6 +11,8 @@ import javafx.stage.FileChooser;
 import com.google.gson.*;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HelloController {
     @FXML
@@ -66,7 +68,8 @@ public class HelloController {
         String newTitle = titleTF.getText();
         String newYear = yearTF.getText();
         String newSales = salesTF.getText();
-        if (validInput(newTitle, newYear, newSales)) {
+        List<String> error = validInput(newTitle, newYear, newSales);
+        if (error.isEmpty()) {
             Movies movies = new Movies (newTitle, newYear, newSales);
             ObservableList<Movies> m = moviesTV.getItems();
             m.add(movies);
@@ -81,20 +84,42 @@ public class HelloController {
         }
         else {
             System.out.println ("invalid input");
+            errorAlert(error);
         }
     }
 
-    private boolean validInput (String title, String year, String sales) {
-        if (title.isEmpty() || !title.matches("[A-Z][\\W\\w\\s]*")) {
-            return false;
+    private List<String> validInput (String title, String year, String sales) {
+        List<String> errorMsg = new ArrayList<>();
+        if (title.isEmpty()) {
+            errorMsg.add("Title cannot be empty");
         }
-        if (year.isEmpty() || !year.matches("\\d*")) {
-            return false;
+        else if (!title.matches("[A-Z][\\W\\w\\s]*")) {
+            errorMsg.add("Title needs to begin with capital letter");
         }
-        if (sales.isEmpty() || !sales.matches("\\d+(\\.\\d+)?")) {
-            return false;
+        if (year.isEmpty()) {
+            errorMsg.add("Year cannot be empty");
         }
-        return true;
+        else if (!year.matches("\\d\\d\\d\\d")) {
+            errorMsg.add("Year must contain four digits");
+        }
+        if (sales.isEmpty()) {
+            errorMsg.add("Sales cannot be empty");
+        }
+        else if (!sales.matches("\\d+(\\.\\d+)?")) {
+            errorMsg.add("Sales can only contain digits. The decimal point is optional. " +
+                    "If the decimal point is included, then there must be at least one before " +
+                    "and one number after it");
+        }
+        return errorMsg;
+    }
+
+    public void errorAlert (List<String> error) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Warning");
+        alert.setHeaderText("Invalid Input");
+        String content = String.join("\n", error);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     public void handleDeleteRecordsButton (ActionEvent event) {
