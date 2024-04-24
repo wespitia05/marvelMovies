@@ -1,62 +1,72 @@
 [
   {
-    "sales": 1520538536, 
+    "sales": 1.520538536E9, 
     "year": 2012, 
     "title": "The Avengers" 
   },
   {
-    "sales": 1131416446, 
+    "sales": 1.131416446E9, 
     "year": 2019, 
     "title": "Captain Marvel" 
   },
   {
-    "sales": 585796247, 
+    "sales": 5.85796247E8, 
     "year": 2008, 
     "title": "Iron Man" 
   },
   {
-    "sales": 773350147, 
+    "sales": 7.73350147E8, 
     "year": 2014, 
     "title": "Guardians of the Galaxy" 
   },
   {
-    "sales": 622674139, 
+    "sales": 6.22674139E8, 
     "year": 2018, 
     "title": "Ant-Man and the Wasp" 
   },
   {
-    "sales": 1349926083, 
+    "sales": 1.349926083E9, 
     "year": 2018, 
     "title": "Black Panther" 
   },
   {
-    "sales": 432224634, 
+    "sales": 4.32224634E8, 
     "year": 2021, 
     "title": "Shang-Chi and the Legend of the Ten Rings" 
   },
   {
-    "sales": 880166924, 
+    "sales": 4.49326618E8, 
+    "year": 2011, 
+    "title": "Thor" 
+  },
+  {
+    "sales": 8.80166924E8, 
     "year": 2017, 
     "title": "Spider-Man: Homecoming" 
   },
   {
-    "sales": 677796076, 
+    "sales": 6.77796076E8, 
     "year": 2016, 
     "title": "Doctor Strange" 
   },
   {
-    "sales": 379751131, 
+    "sales": 3.79751131E8, 
     "year": 2021, 
     "title": "Black Widow" 
   },
   {
-    "sales": 370569776, 
+    "sales": 3.70569776E8, 
     "year": 2011, 
     "title": "Captain America: The First Avenger" 
   },
   {
-    "sales": 423354353, 
+    "sales": 3.24545535E8, 
     "year": 2002, 
-    "title": "Spider-man" 
+    "title": "Spiderman" 
+  },
+  {
+    "sales": 3.242454534E9, 
+    "year": 2016, 
+    "title": "Antman" 
   }
 ]

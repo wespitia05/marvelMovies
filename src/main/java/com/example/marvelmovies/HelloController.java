@@ -1,6 +1,9 @@
 package com.example.marvelmovies;
 
+import com.healthmarketscience.jackcess.Database;
+import com.healthmarketscience.jackcess.DatabaseBuilder;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -10,7 +13,7 @@ import javafx.stage.FileChooser;
 import com.google.gson.*;
 
 import java.io.*;
-import java.util.ArrayList;
+import java.sql.*;
 import java.util.List;
 
 public class HelloController {
@@ -59,34 +62,61 @@ public class HelloController {
 
     public void handleListRecordsButton () {
         System.out.println ("handleListRecordsButton called");
+
+        ObservableList<Movies> movies = getMoviesFromDB();
+        moviesTV.setItems(movies);
+
+        statusLabel.setText("movie table displayed");
     }
 
-    public void handleAddRecordsButton () {
-        System.out.println ("handleAddRecordsButton called");
+    public ObservableList<Movies> getMoviesFromDB() {
+        ObservableList<Movies> movies = FXCollections.observableArrayList();
+        String dbFilePath = ".//MoviesDB.accdb";
+        String databaseURL = "jdbc:ucanaccess://" + dbFilePath;
+        String sql = "SELECT Title, Year, Sales FROM MoviesDB";
+
+        try (Connection conn = DriverManager.getConnection(databaseURL);
+             Statement stmt = conn.createStatement();
+             ResultSet result = stmt.executeQuery(sql)) {
+
+            while (result.next()) {
+                String title = result.getString("Title");
+                int year = result.getInt("Year");
+                double sales = result.getDouble("Sales");
+                movies.add(new Movies(title, year, sales));
+            }
+            System.out.println ("data displayed successfully into table view from db");
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return movies;
+    }
+
+    public void handleAddRecordsButton() {
+        String dbFilePath = ".//MoviesDB.accdb";
+        String databaseURL = "jdbc:ucanaccess://" + dbFilePath;
 
         String newTitle = titleTF.getText();
         String newYear = yearTF.getText();
         String newSales = salesTF.getText();
 
-        List<String> error = Validation.validInput(newTitle, newYear, newSales);
-        if (error.isEmpty()) {
-            Integer yearValue = Integer.parseInt(newYear);
-            Double salesValue = Double.valueOf(newSales);
-            Movies movies = new Movies (newTitle, yearValue, salesValue);
-            ObservableList<Movies> m = moviesTV.getItems();
-            m.add(movies);
-
-            System.out.println ("movie added:");
-            System.out.println ("\ttitle: " + newTitle + "\tyear: " + newYear + "\tsales: " + newSales);
-            statusLabel.setText("A movie has been inserted: \"" + newTitle + "\"");
-
-            titleTF.clear();
-            yearTF.clear();
-            salesTF.clear();
-        }
-        else {
-            System.out.println ("invalid input");
-            errorAlert(error);
+        List<String> errors = Validation.validInput(newTitle, newYear, newSales);
+        if (errors.isEmpty()) {
+            try {
+                Connection conn = DriverManager.getConnection(databaseURL);
+                insertData(conn, newTitle, Integer.parseInt(newYear), Double.parseDouble(newSales));
+                System.out.println ("inserted movie into database successfully");
+                statusLabel.setText("a movie has been inserted: \"" + newTitle + "\"");
+                // moviesTV.setItems(getMoviesFromDB());
+                titleTF.clear();
+                yearTF.clear();
+                salesTF.clear();
+            } catch (Exception e) {
+                errors.add("error inserting movie into database: " + e.getMessage());
+                errorAlert(errors);
+            }
+        } else {
+            errorAlert(errors);
         }
     }
 
@@ -103,6 +133,8 @@ public class HelloController {
         System.out.println ("handleDeleteRecordsButton called");
         Movies selectedItem = moviesTV.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
+            deleteMovieFromDB(selectedItem.getTitle());
+            System.out.println ("successfully removed movie from database");
             ObservableList<Movies> m = moviesTV.getItems();
             m.remove(selectedItem);
             System.out.println ("selection that will be deleted:");
@@ -111,12 +143,69 @@ public class HelloController {
         }
     }
 
-    public void handleCreateTableMenuItem () {
-        System.out.println ("handleCreateTableMenuItem called");
+    private void deleteMovieFromDB(String title) {
+        String dbFilePath = ".//MoviesDB.accdb";
+        String databaseURL = "jdbc:ucanaccess://" + dbFilePath;
+        String sql = "DELETE FROM MoviesDB WHERE Title = ?";
+
+        try (Connection conn = DriverManager.getConnection(databaseURL);
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+             preparedStatement.setString(1, title);
+        } catch (SQLException e) {
+            System.err.println("error deleting movie from database: " + e.getMessage());
+        }
     }
 
-    public void handleImportJsonMenuItem () {
-        System.out.println ("handleImportJsonMenuItem called");
+    public void handleCreateTableMenuItem () {
+        System.out.println ("handleCreateTableMenuItem called");
+
+        // creating database and table
+
+        String dbFilePath = ".//MoviesDB.accdb";
+        String databaseURL = "jdbc:ucanaccess://" + dbFilePath;
+        File dbFile = new File(dbFilePath);
+        if (!dbFile.exists()) {
+            try (Database db = DatabaseBuilder.create(Database.FileFormat.V2010, new File(dbFilePath))) {
+                System.out.println("The database file has been created.");
+                Connection conn = DriverManager.getConnection(databaseURL);
+                String sql;
+                sql = "CREATE TABLE MoviesDB (Title nvarchar(255), Year INT, Sales DOUBLE)";
+                Statement createTableStatement = conn.createStatement();
+                createTableStatement.execute(sql);
+                conn.commit();
+            } catch (IOException ioe) {
+                ioe.printStackTrace(System.err);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            System.out.println ("database table already exists");
+        }
+    }
+
+    public static void insertData(Connection conn, String title, int year, double sales) {
+        // the three ? characters will be filled with data by the preparedStatement class
+        String sql = "INSERT INTO MoviesDB (Title, Year, Sales) VALUES (?, ?, ?)";
+        PreparedStatement preparedStatement = null;
+        try {
+            // declares that conn has a valid connection to the database
+            preparedStatement = conn.prepareStatement(sql);
+            // replaces the first ? in the SQL string with data from the first variable
+            preparedStatement.setString(1, title);
+            // replaces the second ? in the SQL string with data from the second variable
+            preparedStatement.setInt(2, year);
+            // replaces the third ? in the SQL string with data from the third variable
+            preparedStatement.setDouble(3, sales);
+            // once all data is inserted, it will execute the preparedStatement
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void handleImportJsonMenuItem() {
+        System.out.println("handleImportJsonMenuItem called");
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Import");
@@ -124,37 +213,42 @@ public class HelloController {
         File selectedFile = fileChooser.showOpenDialog(null);
 
         if (selectedFile != null) {
-            try {
-                readFile(selectedFile);
-                System.out.println ("json file successfully displayed in table view");
-                statusLabel.setText("Imported data from " + selectedFile.getAbsolutePath());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            String dbFilePath = ".//MoviesDB.accdb";
+            String databaseURL = "jdbc:ucanaccess://" + dbFilePath;
+
+            clearDataBase();
+
+            try (Connection conn = DriverManager.getConnection(databaseURL)) {
+                Gson gson = new Gson();
+                try (Reader reader = new FileReader(selectedFile)) {
+                    Movies[] movies = gson.fromJson(reader, Movies[].class);
+                    for (Movies movie : movies) {
+                        insertData(conn, movie.getTitle(), movie.getYear(), movie.getSales());
+                    }
+                    conn.commit(); // Commit the transaction
+                    System.out.println("data loaded from json to database successfully");
+                    statusLabel.setText("imported data from " + selectedFile.getAbsolutePath());
+                } catch (IOException ex) {
+                    System.err.println("error reading json file: " + ex.getMessage());
+                    conn.rollback(); // Rollback on error
+                }
+            } catch (SQLException ex) {
+                throw new RuntimeException("database connection failed", ex);
             }
         }
     }
 
-    public void readFile (File file) {
-        try (FileReader reader = new FileReader(file)) {
-            JsonParser parser = new JsonParser();
-            JsonArray jArray = parser.parse(reader).getAsJsonArray();
-            ObservableList<Movies> movies = moviesTV.getItems();
-            moviesTV.getItems().clear();
-            for (JsonElement e : jArray) {
-                JsonObject jObj = e.getAsJsonObject();
-                String title = jObj.get("title").getAsString();
-                String year = jObj.get("year").getAsString();
-                String sales = jObj.get("sales").getAsString();
-                Integer yearValue = Integer.parseInt(year);
-                Double salesValue = Double.valueOf(sales);
-                Movies m = new Movies (title, yearValue, salesValue);
-                movies.add(m);
+    public void clearDataBase() {
+        String dbFilePath = ".//MoviesDB.accdb";
+        String databaseURL = "jdbc:ucanaccess://" + dbFilePath;
+        try (Connection conn = DriverManager.getConnection(databaseURL)) {
+            String sql = "DELETE FROM MoviesDB";
+            try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+                int rowsDeleted = preparedStatement.executeUpdate();
+                System.out.println("number of rows deleted: " + rowsDeleted);
             }
-            System.out.println ("successfully read json file");
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException("failed to clear database", e);
         }
     }
 
@@ -165,25 +259,26 @@ public class HelloController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
         File selectedFile = fileChooser.showOpenDialog(null);
         if (selectedFile != null) {
-            saveFile(selectedFile);
+            ObservableList<Movies> movies = getMoviesFromDB();
+            saveFile(selectedFile, movies);
             System.out.println ("exported json file successfully");
-            statusLabel.setText("Exported data to " + selectedFile.getAbsolutePath());
+            statusLabel.setText("exported data to " + selectedFile.getAbsolutePath());
         }
     }
 
-    private void saveFile (File file) {
+    private void saveFile (File file, ObservableList<Movies> movies) {
         try (FileWriter writer = new FileWriter(file)) {
             StringBuilder toJson = new StringBuilder();
-            toJson.append("[\n");
-            ObservableList<Movies> m = moviesTV.getItems();
-            for (Movies movies : m) {
+            movies = moviesTV.getItems();
+            toJson.append ("[\n");
+            for (Movies m : movies) {
                 toJson.append ("  {\n")
-                        .append ("    \"sales\": ").append (movies.getSales()).append (", \n")
-                        .append ("    \"year\": ").append (movies.getYear()).append (", \n")
-                        .append ("    \"title\": \"").append (movies.getTitle()).append ("\" \n")
+                        .append ("    \"sales\": ").append (m.getSales()).append (", \n")
+                        .append ("    \"year\": ").append (m.getYear()).append (", \n")
+                        .append ("    \"title\": \"").append (m.getTitle()).append ("\" \n")
                         .append ("  },\n");
             }
-            if (!m.isEmpty()) {
+            if (!movies.isEmpty()) {
                 toJson.setLength(toJson.length() - 2);
             }
             toJson.append ("\n]");
@@ -192,7 +287,6 @@ public class HelloController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     public void handleExitMenuItem () {
