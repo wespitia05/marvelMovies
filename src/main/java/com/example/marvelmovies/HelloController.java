@@ -93,6 +93,7 @@ public class HelloController {
     }
 
     public void handleAddRecordsButton() {
+        System.out.println ("handleAddRecordsButton called");
         String dbFilePath = ".//MoviesDB.accdb";
         String databaseURL = "jdbc:ucanaccess://" + dbFilePath;
 
@@ -107,7 +108,7 @@ public class HelloController {
                 insertData(conn, newTitle, Integer.parseInt(newYear), Double.parseDouble(newSales));
                 System.out.println ("inserted movie into database successfully");
                 statusLabel.setText("a movie has been inserted: \"" + newTitle + "\"");
-                // moviesTV.setItems(getMoviesFromDB());
+                moviesTV.setItems(getMoviesFromDB());
                 titleTF.clear();
                 yearTF.clear();
                 salesTF.clear();
@@ -225,12 +226,12 @@ public class HelloController {
                     for (Movies movie : movies) {
                         insertData(conn, movie.getTitle(), movie.getYear(), movie.getSales());
                     }
-                    conn.commit(); // Commit the transaction
+                    moviesTV.setItems(getMoviesFromDB());
+                    conn.commit();
                     System.out.println("data loaded from json to database successfully");
                     statusLabel.setText("imported data from " + selectedFile.getAbsolutePath());
                 } catch (IOException ex) {
                     System.err.println("error reading json file: " + ex.getMessage());
-                    conn.rollback(); // Rollback on error
                 }
             } catch (SQLException ex) {
                 throw new RuntimeException("database connection failed", ex);
