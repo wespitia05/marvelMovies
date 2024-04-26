@@ -66,7 +66,7 @@ public class HelloController {
         ObservableList<Movies> movies = getMoviesFromDB();
         moviesTV.setItems(movies);
 
-        statusLabel.setText("movie table displayed");
+        statusLabel.setText("Movie table displayed");
     }
 
     public ObservableList<Movies> getMoviesFromDB() {
@@ -107,7 +107,7 @@ public class HelloController {
                 Connection conn = DriverManager.getConnection(databaseURL);
                 insertData(conn, newTitle, Integer.parseInt(newYear), Double.parseDouble(newSales));
                 System.out.println ("inserted movie into database successfully");
-                statusLabel.setText("a movie has been inserted: \"" + newTitle + "\"");
+                statusLabel.setText("A movie has been inserted: \"" + newTitle + "\"");
                 moviesTV.setItems(getMoviesFromDB());
                 titleTF.clear();
                 yearTF.clear();
@@ -135,10 +135,9 @@ public class HelloController {
         Movies selectedItem = moviesTV.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
             deleteMovieFromDB(selectedItem.getTitle());
-            System.out.println ("successfully removed movie from database");
             ObservableList<Movies> m = moviesTV.getItems();
             m.remove(selectedItem);
-            System.out.println ("selection that will be deleted:");
+            System.out.println ("selection that will be deleted from table view:");
             System.out.println ("\ttitle: " + selectedItem.title + "\tyear: " + selectedItem.year + "\tsales: " + selectedItem.sales);
             statusLabel.setText("A movie has been deleted: \"" + selectedItem.title + "\"");
         }
@@ -147,13 +146,16 @@ public class HelloController {
     private void deleteMovieFromDB(String title) {
         String dbFilePath = ".//MoviesDB.accdb";
         String databaseURL = "jdbc:ucanaccess://" + dbFilePath;
-        String sql = "DELETE FROM MoviesDB WHERE Title = ?";
-
-        try (Connection conn = DriverManager.getConnection(databaseURL);
-             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-             preparedStatement.setString(1, title);
+        try (Connection conn = DriverManager.getConnection(databaseURL)) {
+            String sql = "DELETE FROM MoviesDB WHERE Title = ?";
+            try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+                preparedStatement.setString(1, title);
+                int rowsDeleted = preparedStatement.executeUpdate();
+                System.out.println("number of rows deleted: " + rowsDeleted);
+                System.out.println("movie removed successfully from database: " + title);
+            }
         } catch (SQLException e) {
-            System.err.println("error deleting movie from database: " + e.getMessage());
+            throw new RuntimeException("failed to clear database", e);
         }
     }
 
@@ -229,7 +231,7 @@ public class HelloController {
                     moviesTV.setItems(getMoviesFromDB());
                     conn.commit();
                     System.out.println("data loaded from json to database successfully");
-                    statusLabel.setText("imported data from " + selectedFile.getAbsolutePath());
+                    statusLabel.setText("Imported data from " + selectedFile.getAbsolutePath());
                 } catch (IOException ex) {
                     System.err.println("error reading json file: " + ex.getMessage());
                 }
@@ -263,7 +265,7 @@ public class HelloController {
             ObservableList<Movies> movies = getMoviesFromDB();
             saveFile(selectedFile, movies);
             System.out.println ("exported json file successfully");
-            statusLabel.setText("exported data to " + selectedFile.getAbsolutePath());
+            statusLabel.setText("Exported data to " + selectedFile.getAbsolutePath());
         }
     }
 

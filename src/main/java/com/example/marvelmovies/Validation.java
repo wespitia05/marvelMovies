@@ -21,7 +21,7 @@ public class Validation {
         if (sales.isEmpty()) {
             errorMsg.add("Sales cannot be empty");
         }
-        else if (!sales.matches("(\\d+)?\\.(\\d+)?")) {
+        else if (!sales.matches("\\d*\\.?\\d+")) {
             errorMsg.add("Sales can only contain digits. The decimal point is optional. " +
                     "If the decimal point is included, then there must be at least one before " +
                     "and one number after it");
